@@ -77,23 +77,6 @@ The A100 is the right choice because:
 
 ---
 
-## Key Changes from ROSA Deployment
-
-| Component | ROSA | ARO |
-|-----------|------|-----|
-| Cluster | ROSA HCP (AWS) | ARO (Azure) |
-| GPU | L40S 48 GB (`g6e.2xlarge`) | **A100 80 GB** (`Standard_NC24ads_A100_v4`) |
-| GPU provisioning | RHCS Terraform machine pool | **MachineSet script post-cluster** |
-| Context window | 32,768 tokens | **65,536 tokens** |
-| Storage class | `gp3-csi` | **`managed-premium`** |
-| RHOAI version | 2.x (`stable-2.19`) | **3.3 (`fast-3.x`)** |
-| llm-d AI Gateway | Technology Preview | **GA at v0.4** |
-| Inferentia nodes | Optional | **Removed** |
-| Neuron Operator | Optional | **Removed** |
-| DRA Driver | Optional | **Removed** |
-
----
-
 ## Infrastructure
 
 | Resource | Type | Count |
@@ -164,7 +147,7 @@ For full deployment instructions, see [PCA_Deployment_ARO/README.md](PCA_Deploym
 | Model | `Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8` | State-of-the-art code reasoning, FP8 quantized |
 | GPU | NVIDIA A100 80 GB | Single-GPU fit with headroom |
 | dtype | `bf16` | A100 native compute dtype (better than fp16 for training stability) |
-| max-model-len | 65,536 | Larger context than ROSA (80 GB vs 48 GB VRAM) |
+| max-model-len | 65,536 | Full 65K context window enabled by A100's 80 GB HBM2 |
 | KV cache dtype | `fp8` | Maximises KV cache capacity on A100 |
 | GPU memory utilization | 90% | Leaves 8 GB headroom for activation memory |
 | Tool call parser | `qwen3_coder` | Required for Roo Code structured tool calls |
@@ -229,8 +212,7 @@ _TTFT = Time to First Token · ITL = Inter-Token Latency_
 
 **Expected performance baseline (pre-test estimate based on A100 published data):**
 - Single-user TTFT: < 500 ms for 512-token prompts
-- Throughput at concurrency 4: ~800–1,200 tokens/sec (BF16 compute, FP8 KV)
-- A100 vs L40S: ~15–20% higher throughput due to HBM2 memory bandwidth
+- Throughput at concurrency 4: ~800–1,200 tokens/sec (BF16 compute, FP8 KV cache)
 
 ---
 
@@ -239,6 +221,6 @@ _TTFT = Time to First Token · ITL = Inter-Token Latency_
 - [ ] Run `guidellm` sweep and populate benchmark table above
 - [ ] Validate HTPasswd IDP configuration for DevSpaces user onboarding
 - [ ] Test Roo Code, Continue, and Cline end-to-end within ARO Dev Spaces
-- [ ] Compare TTFT and throughput vs ROSA (L40S) baseline
+- [ ] Add architecture diagrams: Azure infrastructure view, AI serving traffic flow, DevSpaces user journey, and Red Hat component stack view
 - [ ] Document any ARO-specific networking or security group adjustments found during testing
 - [ ] Evaluate Azure Reserved Instance pricing for 1-year commitment
