@@ -6,11 +6,6 @@ variable "subscription_id" {
   type        = string
 }
 
-variable "tenant_id" {
-  description = "Azure Active Directory tenant ID"
-  type        = string
-}
-
 variable "environment" {
   description = "Environment name (e.g. dev, staging, prod)"
   type        = string
@@ -40,7 +35,7 @@ variable "location" {
 variable "aro_version" {
   description = "OpenShift version for ARO cluster (e.g. 4.19.19)"
   type        = string
-  default     = "4.19.19"
+  default     = "4.19.20"
 }
 
 variable "pull_secret" {
@@ -132,16 +127,6 @@ variable "master_vm_size" {
   description = "VM size for ARO master (control plane) nodes"
   type        = string
   default     = "Standard_D8s_v5"
-}
-
-# ──────────────────────────────────────────────
-# Identity / Service Principal
-# (Used for ARO cluster identity and networking permissions)
-# ──────────────────────────────────────────────
-variable "service_principal_name" {
-  description = "Display name for the Azure AD service principal created for ARO"
-  type        = string
-  default     = "aro-pca-sp"
 }
 
 # ──────────────────────────────────────────────

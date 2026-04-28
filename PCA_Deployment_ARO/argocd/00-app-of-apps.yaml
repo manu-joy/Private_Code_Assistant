@@ -34,7 +34,7 @@ metadata:
 spec:
   project: private-code-assistant
   source:
-    repoURL: REPLACE_WITH_GITOPS_REPO_URL
+    repoURL: https://github.com/manu-joy/Private_Code_Assistant
     targetRevision: main
     path: PCA_Deployment_ARO/argocd/01-operators
   destination:
@@ -67,7 +67,7 @@ metadata:
 spec:
   project: private-code-assistant
   source:
-    repoURL: REPLACE_WITH_GITOPS_REPO_URL
+    repoURL: https://github.com/manu-joy/Private_Code_Assistant
     targetRevision: main
     path: PCA_Deployment_ARO/argocd/02-platform-config
   destination:
@@ -99,7 +99,7 @@ metadata:
 spec:
   project: private-code-assistant
   source:
-    repoURL: REPLACE_WITH_GITOPS_REPO_URL
+    repoURL: https://github.com/manu-joy/Private_Code_Assistant
     targetRevision: main
     path: PCA_Deployment_ARO/argocd/03-ai-serving
   destination:
@@ -131,7 +131,7 @@ metadata:
 spec:
   project: private-code-assistant
   source:
-    repoURL: REPLACE_WITH_GITOPS_REPO_URL
+    repoURL: https://github.com/manu-joy/Private_Code_Assistant
     targetRevision: main
     path: PCA_Deployment_ARO/argocd/04-devspaces
   destination:

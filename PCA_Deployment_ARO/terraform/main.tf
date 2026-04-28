@@ -51,128 +51,85 @@ resource "azurerm_subnet" "worker" {
   service_endpoints = ["Microsoft.ContainerRegistry"]
 }
 
-# ════════════════════════════════════════════════
-# Network Security Group (ARO minimum rules)
-# ════════════════════════════════════════════════
-resource "azurerm_network_security_group" "aro" {
-  name                = "${local.cluster_name}-nsg"
-  location            = azurerm_resource_group.aro.location
-  resource_group_name = azurerm_resource_group.aro.name
-  tags                = local.tags
-
-  security_rule {
-    name                       = "AllowInternalVnet"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-  }
-
-  security_rule {
-    name                       = "AllowARO"
-    priority                   = 101
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_ranges    = ["6443", "443", "80"]
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-}
-
-resource "azurerm_subnet_network_security_group_association" "master" {
-  subnet_id                 = azurerm_subnet.master.id
-  network_security_group_id = azurerm_network_security_group.aro.id
-}
-
-resource "azurerm_subnet_network_security_group_association" "worker" {
-  subnet_id                 = azurerm_subnet.worker.id
-  network_security_group_id = azurerm_network_security_group.aro.id
-}
+# NOTE: ARO creates and manages its own NSG on the subnets.
+# Do not pre-attach an NSG to cluster subnets — ARO will reject the create request.
 
 # ════════════════════════════════════════════════
-# Azure AD Service Principal for ARO
+# ARO Cluster via Azure CLI
+# az aro create handles service principal creation internally,
+# which works for guest users who cannot create AAD app registrations
+# directly via the AzureAD Terraform provider.
 # ════════════════════════════════════════════════
-resource "azuread_application" "aro" {
-  display_name = var.service_principal_name
-}
-
-resource "azuread_service_principal" "aro" {
-  client_id = azuread_application.aro.client_id
-}
-
-resource "azuread_service_principal_password" "aro" {
-  service_principal_id = azuread_service_principal.aro.id
-  end_date             = timeadd(timestamp(), "8760h") # 1 year
-}
-
-# Network Contributor on the VNet (ARO needs to manage network resources)
-resource "azurerm_role_assignment" "aro_vnet_contributor" {
-  scope                = azurerm_virtual_network.aro.id
-  role_definition_name = "Network Contributor"
-  principal_id         = azuread_service_principal.aro.object_id
-}
-
-# Contributor on the resource group (ARO creates internal resource group + managed resources)
-resource "azurerm_role_assignment" "aro_rg_contributor" {
-  scope                = azurerm_resource_group.aro.id
-  role_definition_name = "Contributor"
-  principal_id         = azuread_service_principal.aro.object_id
-}
-
-# ════════════════════════════════════════════════
-# ARO Cluster
-# ════════════════════════════════════════════════
-resource "azurerm_redhat_openshift_cluster" "aro" {
-  name                = local.cluster_name
-  location            = azurerm_resource_group.aro.location
-  resource_group_name = azurerm_resource_group.aro.name
-  tags                = local.tags
-
-  cluster_profile {
-    domain      = local.domain
-    version     = var.aro_version
-    pull_secret = var.pull_secret
+resource "null_resource" "aro_create" {
+  triggers = {
+    cluster_name = local.cluster_name
+    rg_name      = azurerm_resource_group.aro.name
+    vnet_name    = azurerm_virtual_network.aro.name
+    version      = var.aro_version
   }
 
-  network_profile {
-    pod_cidr     = var.pod_cidr
-    service_cidr = var.service_cidr
-  }
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
 
-  main_profile {
-    vm_size   = var.master_vm_size
-    subnet_id = azurerm_subnet.master.id
-  }
+      RG="${azurerm_resource_group.aro.name}"
+      CLUSTER="${local.cluster_name}"
 
-  worker_profile {
-    vm_size      = var.worker_vm_size
-    subnet_id    = azurerm_subnet.worker.id
-    disk_size_gb = var.worker_disk_size_gb
-    node_count   = var.worker_replicas
-  }
+      # Idempotency: skip if cluster already exists
+      EXISTING=$(az aro list --resource-group "$RG" --query "[?name=='$CLUSTER'].name" -o tsv 2>/dev/null || true)
+      if [ -n "$EXISTING" ]; then
+        echo "ARO cluster '$CLUSTER' already exists in '$RG'. Skipping creation."
+        exit 0
+      fi
 
-  api_server_profile {
-    visibility = "Public"
-  }
+      echo "Writing pull secret to temp file..."
+      PULL_SECRET_FILE="/tmp/pull-secret-$$.json"
+      cat > "$PULL_SECRET_FILE" << 'PULLEOF'
+${var.pull_secret}
+PULLEOF
 
-  ingress_profile {
-    visibility = "Public"
-  }
+      echo "Creating ARO cluster: $CLUSTER in $RG ..."
+      az aro create \
+        --resource-group "$RG" \
+        --name "$CLUSTER" \
+        --vnet "${azurerm_virtual_network.aro.name}" \
+        --master-subnet "${azurerm_subnet.master.name}" \
+        --worker-subnet "${azurerm_subnet.worker.name}" \
+        --pull-secret "@$PULL_SECRET_FILE" \
+        --version "${var.aro_version}" \
+        --master-vm-size "${var.master_vm_size}" \
+        --worker-vm-size "${var.worker_vm_size}" \
+        --worker-count ${var.worker_replicas} \
+        --worker-vm-disk-size-gb ${var.worker_disk_size_gb} \
+        --pod-cidr "${var.pod_cidr}" \
+        --service-cidr "${var.service_cidr}" \
+        --apiserver-visibility Public \
+        --ingress-visibility Public \
+        --no-wait
 
-  service_principal {
-    client_id     = azuread_application.aro.client_id
-    client_secret = azuread_service_principal_password.aro.value
+      rm -f "$PULL_SECRET_FILE"
+
+      echo "ARO cluster creation started. Waiting for it to reach Succeeded state..."
+      for i in $(seq 1 90); do
+        STATE=$(az aro show --resource-group "$RG" --name "$CLUSTER" \
+          --query "provisioningState" -o tsv 2>/dev/null || echo "Unknown")
+        echo "  ($i/90) State: $STATE"
+        if [ "$STATE" = "Succeeded" ]; then
+          echo "ARO cluster is ready!"
+          break
+        elif [ "$STATE" = "Failed" ]; then
+          echo "ERROR: ARO cluster creation failed!"
+          az aro show --resource-group "$RG" --name "$CLUSTER" -o json
+          exit 1
+        fi
+        sleep 30
+      done
+    EOT
   }
 
   depends_on = [
-    azurerm_role_assignment.aro_vnet_contributor,
-    azurerm_role_assignment.aro_rg_contributor,
+    azurerm_subnet.master,
+    azurerm_subnet.worker,
   ]
 }
 
@@ -181,7 +138,7 @@ resource "azurerm_redhat_openshift_cluster" "aro" {
 # ════════════════════════════════════════════════
 resource "null_resource" "oc_login" {
   triggers = {
-    cluster_id = azurerm_redhat_openshift_cluster.aro.id
+    cluster_create = null_resource.aro_create.id
   }
 
   provisioner "local-exec" {
@@ -189,13 +146,18 @@ resource "null_resource" "oc_login" {
       set -e
       echo "Retrieving ARO credentials..."
 
-      API_URL="${azurerm_redhat_openshift_cluster.aro.api_server_profile[0].url}"
+      RG="${azurerm_resource_group.aro.name}"
+      CLUSTER="${local.cluster_name}"
+
+      API_URL=$(az aro show --resource-group "$RG" --name "$CLUSTER" \
+        --query "apiserverProfile.url" -o tsv)
+
       KUBEADMIN_PASS=$(az aro list-credentials \
-        --name ${local.cluster_name} \
-        --resource-group ${azurerm_resource_group.aro.name} \
+        --name "$CLUSTER" \
+        --resource-group "$RG" \
         --query kubeadminPassword -o tsv)
 
-      echo "Logging into ARO cluster..."
+      echo "Logging into ARO cluster: $API_URL ..."
       oc login "$API_URL" \
         --username=kubeadmin \
         --password="$KUBEADMIN_PASS" \
@@ -205,19 +167,19 @@ resource "null_resource" "oc_login" {
     EOT
   }
 
-  depends_on = [azurerm_redhat_openshift_cluster.aro]
+  depends_on = [null_resource.aro_create]
 }
 
 # ════════════════════════════════════════════════
 # GPU MachineSet (A100 — post-cluster provisioning)
-# ARO Terraform only supports one worker profile at cluster creation.
+# ARO only supports one worker profile at cluster creation.
 # GPU nodes are added via MachineSet after the cluster is ready.
 # ════════════════════════════════════════════════
 resource "null_resource" "gpu_machineset" {
   triggers = {
-    cluster_id   = azurerm_redhat_openshift_cluster.aro.id
-    gpu_vm_size  = var.gpu_vm_size
-    gpu_replicas = var.gpu_node_replicas
+    cluster_create = null_resource.aro_create.id
+    gpu_vm_size    = var.gpu_vm_size
+    gpu_replicas   = var.gpu_node_replicas
   }
 
   provisioner "local-exec" {

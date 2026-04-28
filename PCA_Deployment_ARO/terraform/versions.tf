@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 3.0"
-    }
     null = {
       source  = "hashicorp/null"
       version = ">= 3.0"
@@ -33,8 +29,4 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-}
-
-provider "azuread" {
-  tenant_id = var.tenant_id
 }
