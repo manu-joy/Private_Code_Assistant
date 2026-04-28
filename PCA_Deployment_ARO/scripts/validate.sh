@@ -57,13 +57,13 @@ else
   warn "Check: oc get machineset -n openshift-machine-api"
 fi
 
-# 4. Storage class (Azure managed-premium)
+# 4. Storage class (Azure managed-csi)
 echo ""
 echo "--- Checking Storage ---"
-if oc get storageclass managed-premium &>/dev/null; then
-  pass "StorageClass managed-premium exists"
+if oc get storageclass managed-csi &>/dev/null; then
+  pass "StorageClass managed-csi exists"
 else
-  fail "StorageClass managed-premium not found (required for model-cache PVC)"
+  fail "StorageClass managed-csi not found (required for model-cache PVC)"
 fi
 
 PVC_STATUS=$(oc get pvc model-cache -n ai-serving -o jsonpath='{.status.phase}' 2>/dev/null || echo "NOT_FOUND")
