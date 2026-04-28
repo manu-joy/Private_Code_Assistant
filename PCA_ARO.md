@@ -38,7 +38,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 │  ┌────────────────────────▼────────────────────────────────────────┐   │
 │  │                 AI Inference Tier                                │   │
 │  │  vLLM + KServe (RHOAI 3.3)                                      │   │
-│  │  Qwen3.6-35B-A3B-A3B-Instruct-FP8                               │   │
+│  │  Qwen3.6-35B-A3B-FP8                               │   │
 │  │  NVIDIA A100 80 GB  ·  BF16 compute  ·  FP8 KV cache            │   │
 │  │  Standard_NC24ads_A100_v4  ($3.67/hr)                           │   │
 │  └─────────────────────────────────────────────────────────────────┘   │
@@ -47,7 +47,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 │  │     Platform Operators     │  │       Azure Infrastructure       │  │
 │  │  RHOAI 3.3 (fast-3.x)     │  │  Resource Group · VNet           │  │
 │  │  OpenShift GitOps          │  │  Azure AD Service Principal      │  │
-│  │  NVIDIA GPU Operator       │  │  managed-premium storage         │  │
+│  │  NVIDIA GPU Operator       │  │  managed-csi storage         │  │
 │  │  Service Mesh · Serverless │  │  East US region                  │  │
 │  └────────────────────────────┘  └──────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -87,7 +87,7 @@ The A100 is the right choice because:
 | GPU nodes | `Standard_NC24ads_A100_v4` | 1 |
 | Virtual Network | Azure VNet | 1 |
 | Subnets | Master + Worker | 2 |
-| Storage | managed-premium PVC | 100 Gi |
+| Storage | managed-csi PVC | 100 Gi |
 
 **Estimated monthly cost (East US, pay-as-you-go):**
 - ARO cluster fee: ~$0.18/hr (Microsoft managed control plane)
@@ -144,7 +144,7 @@ For full deployment instructions, see [PCA_Deployment_ARO/README.md](PCA_Deploym
 
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
-| Model | `unsloth/Qwen3.6-35B-A3B` | State-of-the-art code reasoning, FP8 quantized |
+| Model | `Qwen/Qwen3.6-35B-A3B-FP8` | State-of-the-art code reasoning, FP8 quantized |
 | GPU | NVIDIA A100 80 GB | Single-GPU fit with headroom |
 | dtype | `bf16` | A100 native compute dtype (better than fp16 for training stability) |
 | max-model-len | 65,536 | Full 65K context window enabled by A100's 80 GB HBM2 |
@@ -183,7 +183,7 @@ PCA_Deployment_ARO/
 ### guidellm Sweep Results (To Be Updated)
 
 **Test Configuration:**
-- Model: `unsloth/Qwen3.6-35B-A3B`
+- Model: `Qwen/Qwen3.6-35B-A3B-FP8`
 - GPU: `Standard_NC24ads_A100_v4` (NVIDIA A100 80 GB)
 - Concurrency: 1, 2, 4, 8, 16 simultaneous requests
 - Prompt lengths: 256, 512, 1024, 2048 tokens
@@ -193,7 +193,7 @@ PCA_Deployment_ARO/
 # Command used to generate benchmarks (to be run after cluster deployment):
 guidellm benchmark \
   --target https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1 \
-  --model unsloth/Qwen3.6-35B-A3B \
+  --model Qwen/Qwen3.6-35B-A3B-FP8 \
   --max-requests 200 \
   --rate-type sweep \
   --output-path ./benchmark-results/aro-a100-sweep.json

@@ -40,7 +40,7 @@ az provider register --namespace Microsoft.Authorization --wait
 
 - A **Red Hat account** with an active OpenShift subscription
 - **Pull secret** downloaded from [console.redhat.com/openshift/install/pull-secret](https://console.redhat.com/openshift/install/pull-secret)
-- **HuggingFace token** with access to `Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8`
+- **HuggingFace token** with access to `Qwen/Qwen3.6-35B-A3B-FP8`
 
 ---
 
@@ -56,7 +56,7 @@ az provider register --namespace Microsoft.Authorization --wait
 | GPU nodes | 1× `Standard_NC24ads_A100_v4` (NVIDIA A100 80 GB) |
 | RHOAI version | 3.3 (`fast-3.x` channel) |
 | AI Gateway | llm-d v0.4 (GA) |
-| Model | Qwen3-Coder-30B-A3B-Instruct-FP8 |
+| Model | Qwen3.6-35B-A3B-FP8 |
 
 ---
 
