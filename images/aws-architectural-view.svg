@@ -90,7 +90,7 @@
     </g>
   </g>
 
-  <!-- Arrow: Customer  Transit Gateway -->
+  <!-- Arrow: Customer &#x2192; Transit Gateway -->
   <line x1="320" y1="380" x2="390" y2="380" stroke="#ff9900" stroke-width="2.5" marker-end="url(#arrowO)"/>
   <text x="330" y="373" fill="#cc9933" font-size="10">Private VIF</text>
 
@@ -110,7 +110,7 @@
       <text x="120" y="73" text-anchor="middle" fill="#9e7a3d" font-size="10">Route table association</text>
     </g>
 
-    <!-- Arrow: TGW  VPC -->
+    <!-- Arrow: TGW &#x2192; VPC -->
     <line x1="260" y1="300" x2="310" y2="300" stroke="#ff9900" stroke-width="2" marker-end="url(#arrowO)"/>
 
     <!-- PP ROSA VPC PP -->
@@ -129,11 +129,11 @@
       <g transform="translate(380, 14)">
         <rect width="380" height="60" rx="10" fill="#1a1000" stroke="#ff9900" stroke-width="2" filter="url(#sh)"/>
         <text x="190" y="22" text-anchor="middle" fill="#ff9900" font-size="13" font-weight="700">AWS Network Load Balancer (NLB)</text>
-        <text x="190" y="40" text-anchor="middle" fill="#cc9933" font-size="11">Internal &#xB7; HTTPS :443  Istio Gateway</text>
+        <text x="190" y="40" text-anchor="middle" fill="#cc9933" font-size="11">Internal &#xB7; HTTPS :443 &#x2192; Istio Gateway</text>
         <text x="190" y="54" text-anchor="middle" fill="#9e7a3d" font-size="10">AWS PrivateLink endpoint for K8s API :6443</text>
       </g>
 
-      <!-- Arrow NLB  AZs -->
+      <!-- Arrow NLB &#x2192; AZs -->
       <line x1="160" y1="76" x2="160" y2="108" stroke="#ff9900" stroke-width="1.5" marker-end="url(#arrowO)"/>
       <line x1="580" y1="76" x2="580" y2="108" stroke="#ff9900" stroke-width="1.5" marker-end="url(#arrowO)"/>
       <line x1="1000" y1="76" x2="1000" y2="108" stroke="#ff9900" stroke-width="1.5" marker-end="url(#arrowO)"/>
@@ -168,7 +168,7 @@
           <rect width="310" height="80" rx="6" fill="#0a2a4a" stroke="#4a90d9" stroke-width="1"/>
           <text x="155" y="20" text-anchor="middle" fill="#7bb8e0" font-size="11" font-weight="600">Dev Spaces Workspace Pods</text>
           <text x="155" y="36" text-anchor="middle" fill="#4a7a9e" font-size="10">VS Code &#xB7; Continue &#xB7; Cline &#xB7; Roo</text>
-          <text x="155" y="52" text-anchor="middle" fill="#4a7a9e" font-size="10">OpenAI API calls  ClusterIP</text>
+          <text x="155" y="52" text-anchor="middle" fill="#4a7a9e" font-size="10">OpenAI API calls &#x2192; ClusterIP</text>
           <text x="155" y="68" text-anchor="middle" fill="#3a5a7a" font-size="10">Stays cluster-internal</text>
         </g>
 

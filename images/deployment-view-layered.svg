@@ -16,7 +16,7 @@
 
   <!-- Header -->
   <text x="960" y="46" text-anchor="middle" fill="#fff" font-size="28" font-weight="700">Private AI Code Assistant  Deployment View (Layered Architecture)</text>
-  <text x="960" y="70" text-anchor="middle" fill="#8fabc7" font-size="15">Four-Layer Stack: Application  Operator  Platform  Infrastructure</text>
+  <text x="960" y="70" text-anchor="middle" fill="#8fabc7" font-size="15">Four-Layer Stack: Application &#x2192; Operator &#x2192; Platform &#x2192; Infrastructure</text>
   <line x1="60" y1="84" x2="1860" y2="84" stroke="#2a4a6b" stroke-width="1"/>
 
   <!-- Branding -->
@@ -102,7 +102,7 @@
     </g>
   </g>
 
-  <!-- Arrow col 1  col 2 -->
+  <!-- Arrow col 1 &#x2192; col 2 -->
   <line x1="508" y1="480" x2="548" y2="480" stroke="#ff9900" stroke-width="2" marker-end="url(#arrowR)"/>
 
   <!-- PPP COLUMN 2: OPERATOR / DRIVER PPP -->
@@ -185,7 +185,7 @@
     </g>
   </g>
 
-  <!-- Arrow col 2  col 3 -->
+  <!-- Arrow col 2 &#x2192; col 3 -->
   <line x1="1008" y1="480" x2="1048" y2="480" stroke="#ee0000" stroke-width="2" marker-end="url(#arrowR)"/>
 
   <!-- PPP COLUMN 3: PLATFORM PPP -->
@@ -255,7 +255,7 @@
     </g>
   </g>
 
-  <!-- Arrow col 3  col 4 -->
+  <!-- Arrow col 3 &#x2192; col 4 -->
   <line x1="1448" y1="480" x2="1488" y2="480" stroke="#ff9900" stroke-width="2" marker-end="url(#arrowR)"/>
 
   <!-- PPP COLUMN 4: INFRASTRUCTURE PPP -->
