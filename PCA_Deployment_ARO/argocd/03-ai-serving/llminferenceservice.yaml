@@ -1,8 +1,8 @@
-# LLMInferenceService — Qwen3.6-35B-A3B on NVIDIA A100 80 GB via KServe + llm-d
+# LLMInferenceService — Qwen3.6-35B-A3B on NVIDIA A100 80 GB via RHOAI 3.3
 # ARO deployment: Standard_NC24ads_A100_v4 GPU nodes (80 GB HBM2)
 # Qwen3.6-35B-A3B is a MoE model (~3B active params) — low memory footprint, high quality.
-# Model loaded in BF16; FP8 KV cache reduces memory pressure for long context windows.
-# This single CR creates: Deployment, Service, InferencePool, EPP, HTTPRoute
+# RHOAI 3.3 LLMInferenceService automatically creates:
+#   Deployment, Service, InferencePool, EPP router, LeaderWorkerSet
 ---
 apiVersion: serving.kserve.io/v1alpha1
 kind: LLMInferenceService
@@ -13,129 +13,10 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     opendatahub.io/model-type: generative
-    openshift.io/display-name: Qwen3.6 35B A3B
+    openshift.io/display-name: "Qwen3.6 35B A3B"
     security.opendatahub.io/enable-auth: "false"
 spec:
-  modelSpec:
-    uri: hf://unsloth/Qwen3.6-35B-A3B
-    name: unsloth/Qwen3.6-35B-A3B
-    replicas: 1
-  routerSpec:
-    targetModels: {}
-    gatewayRef:
-      name: maas-default-gateway
-      namespace: openshift-ingress
-    route: {}
-    scheduler:
-      template:
-        spec:
-          containers:
-            - name: main
-              args:
-                - --pool-group
-                - inference.networking.x-k8s.io
-                - --pool-name
-                - "{{ ChildName .ObjectMeta.Name `-inference-pool` }}"
-                - --pool-namespace
-                - "{{ .ObjectMeta.Namespace }}"
-                - --grpc-port
-                - "9002"
-                - --grpc-health-port
-                - "9003"
-                - --secure-serving
-                - --model-server-metrics-scheme
-                - https
-                - --config
-                - |
-                  apiVersion: epp.llm-d.ai/v1alpha1
-                  kind: EndpointPickerConfig
-                  metadata:
-                    name: epp-config
-                  spec:
-                    scheduler:
-                      scorers:
-                        - name: queue-scorer
-                          weight: 2
-                        - name: kv-cache-utilization-scorer
-                          weight: 2
-                        - name: prefix-cache-scorer
-                          weight: 3
-              env:
-                - name: TOKENIZER_CACHE_DIR
-                  value: /tmp/tokenizer-cache
-                - name: HF_HOME
-                  value: /tmp/tokenizer-cache/hf
-                - name: TRANSFORMERS_CACHE
-                  value: /tmp/tokenizer-cache/transformers
-                - name: XDG_CACHE_HOME
-                  value: /tmp/tokenizer-cache/xdg
-              volumeMounts:
-                - name: tokenizer-cache
-                  mountPath: /tmp/tokenizer-cache
-                - name: cachi2-cache
-                  mountPath: /cachi2
-          volumes:
-            - name: tokenizer-cache
-              emptyDir:
-                sizeLimit: 2Gi
-            - name: cachi2-cache
-              emptyDir:
-                sizeLimit: 1Gi
-  workloadSpec:
-    template:
-      spec:
-        volumes:
-          - name: kserve-provision-location
-            persistentVolumeClaim:
-              claimName: model-cache
-        containers:
-          - name: main
-            env:
-              - name: VLLM_ADDITIONAL_ARGS
-                value: >-
-                  --disable-uvicorn-access-log
-                  --dtype bf16
-                  --max-model-len 65536
-                  --gpu-memory-utilization 0.90
-                  --enable-prefix-caching
-                  --enable-auto-tool-choice
-                  --tool-call-parser hermes
-                  
-                  --kv-cache-dtype fp8
-            volumeMounts:
-              - name: kserve-provision-location
-                mountPath: /mnt/models
-            resources:
-              requests:
-                cpu: "8"
-                memory: 64Gi
-                nvidia.com/gpu: "1"
-              limits:
-                cpu: "8"
-                memory: 64Gi
-                nvidia.com/gpu: "1"
-            livenessProbe:
-              httpGet:
-                path: /health
-                port: 8000
-                scheme: HTTPS
-              initialDelaySeconds: 300
-              periodSeconds: 30
-              timeoutSeconds: 30
-              failureThreshold: 10
-            readinessProbe:
-              httpGet:
-                path: /health
-                port: 8000
-                scheme: HTTPS
-              initialDelaySeconds: 120
-              periodSeconds: 15
-              timeoutSeconds: 10
-              failureThreshold: 5
-        nodeSelector:
-          node.kubernetes.io/instance-type: Standard_NC24ads_A100_v4
-          nvidia.com/gpu.present: "true"
-        tolerations:
-          - key: nvidia.com/gpu
-            operator: Exists
-            effect: NoSchedule
+  model:
+    uri: "hf://unsloth/Qwen3.6-35B-A3B"
+    name: "unsloth/Qwen3.6-35B-A3B"
+  replicas: 1
