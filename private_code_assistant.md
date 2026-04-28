@@ -55,6 +55,18 @@
 - [Model Caching and Startup Optimization](#model-caching-and-startup-optimization-analysis)
 - [KV Cache Optimization: FP8 Quantization](#kv-cache-optimization-fp8-quantization)
 - [Project Considerations](#project-considerations)
+- [Enterprise Customization for Implementation Services](#enterprise-customization-for-implementation-services)
+  - [Track 1: Customizing for Customer Development Practices](#track-1-customizing-for-customer-development-practices)
+    - [System Prompt and Context Engineering](#11-system-prompt-and-context-engineering)
+    - [Per-Project Context via Rules Files](#12-per-project-context-via-rules-files)
+    - [DevWorkspace Templates per Technology Stack](#13-devworkspace-templates-per-technology-stack)
+    - [MCP Server Integration with Internal Systems](#14-mcp-server-integration-with-internal-systems)
+  - [Track 2: SonarQube-Aware Code Generation](#track-2-sonarqube-aware-code-generation)
+    - [Embedding SonarQube Rule Profiles in System Prompts](#21-embedding-sonarqube-rule-profiles-in-system-prompts)
+    - [SonarQube Findings as Live AI Context](#22-sonarqube-findings-as-live-ai-context)
+    - [Pre-Commit and CI Integration](#23-pre-commit-and-ci-integration)
+    - [Language-Specific SonarQube Customization Matrix](#24-language-specific-sonarqube-customization-matrix)
+    - [Continuous Improvement Loop](#25-continuous-improvement-loop)
 - [Appendix A: Neuron-Scheduler / OVN Annotation Conflict](#appendix-a-neuron-scheduler--ovn-kubernetes-annotation-conflict)
 - [Appendix B: OVN Annotation Fix -- Live Tests](#appendix-b-ovn-annotation-fix----live-test-results-april-2-2026)
 
@@ -3687,6 +3699,173 @@ TurboQuant is not available in vLLM 0.13.0+rhai11 (current RHOAI build). When RH
 - **Container memory right-sizing for Neuron compilation (MANDATORY)** -- Neuron compilation of Qwen3-Coder-30B MoE peaks at ~120 GB RSS (57 GB BF16 model weights + 60+ GB compiler workspace during bucket compilation). A 64Gi limit causes OOMKill during weight loading; a 128Gi limit causes OOMKill during bucket compilation. **Set limits to 200Gi minimum** for cold-cache compilation. Steady-state serving uses only ~15-20 GB. Always patch the `InferenceService` (not the Deployment), as KServe reconciles the Deployment from the InferenceService spec.
 - **SELinux and shared PVCs** -- When multiple pods share a `ReadWriteOnce` PVC on OpenShift, set `seLinuxOptions.level` to the same value (e.g., `s0:c0,c0`) on all pods. Without matching MCS labels, SELinux denies cross-pod file access regardless of Unix permissions.
 - **Heterogeneous llm-d routing** -- Unified routing across NVIDIA and Inferentia requires: (1) same namespace for all backends with `nodeSelector`-based scheduling, (2) **taints on accelerator machine pools** (`nvidia.com/gpu=present:NoSchedule` for GPU, `aws.amazon.com/neuroncore=present:NoSchedule` for Inferentia) with matching tolerations on model deployments — without taints, platform pods consume GPU node CPU and block model scheduling, (3) identical `--served-model-name`, (4) HTTPS on all endpoints via vLLM native `--ssl-certfile`/`--ssl-keyfile` flags (EPP `--model-server-metrics-scheme` is global), (5) separate PVCs per accelerator type, (6) matching `InferencePool` labels on all pods. The prefix-cache scorer naturally favors GPU replicas (which support prefix caching), while Inferentia handles overflow.
+
+---
+
+## Enterprise Customization for Implementation Services
+
+This section describes the customization work that Red Hat Professional Services (or a qualified partner) performs when delivering the Private AI Code Assistant as a managed implementation. The two primary customization tracks are **team-practice alignment** and **quality-gate integration**. Both are delivered as configuration, not code changes — the core platform stack remains fully supported and upgradeable.
+
+---
+
+### Track 1: Customizing for Customer Development Practices
+
+A generic code assistant gives generic output. The value of a privately hosted model increases significantly when the model and extensions are tuned to reflect the specific languages, frameworks, tooling conventions, and architectural patterns that the customer's teams actually use. The following customizations are typically delivered as part of an implementation engagement.
+
+#### 1.1 System Prompt and Context Engineering
+
+The AI extensions (Continue, Cline, Roo Code) all support custom system prompts that are injected before every conversation. These are configured via the Dev Spaces ConfigMap approach (Step 15), meaning they are centrally managed by the platform administrator and applied automatically to every developer workspace without manual action.
+
+**Typical system prompt customisations:**
+
+- **Language and framework context** — explicitly declare the primary stack: *"This is a Java 21 / Spring Boot 3.3 microservices project. Use constructor injection, not field injection. Prefer records for DTOs. Use OpenAPI 3.1 annotations on all REST controllers."*
+- **Internal library preferences** — reference internal SDKs, platform libraries, or banned dependencies: *"Use the internal `com.acme.security:jwt-utils` library for token handling — never use `io.jsonwebtoken` directly."*
+- **Architectural patterns** — enforce agreed patterns: *"All service classes must implement a domain interface. Repository access is only permitted from the service layer, never from controllers or event handlers."*
+- **Naming conventions and style** — package structures, method naming, annotation usage, logging standards: *"Use SLF4J with `@Slf4j`. Log at DEBUG for internal state, INFO for business events, WARN for recoverable errors, ERROR only for exceptions that bubble to the boundary."*
+- **Test framework standards** — preferred test libraries and patterns: *"Write unit tests with JUnit 5 + Mockito. Use AssertJ for assertions. Test class names end in `Test`. Integration tests end in `IT` and are annotated with `@SpringBootTest(webEnvironment = RANDOM_PORT)`."*
+
+#### 1.2 Per-Project Context via Rules Files
+
+All three extensions support project-scoped instructions that override or supplement the global system prompt when a developer is working inside a specific repository:
+
+| Extension | Rules file | Scope |
+|-----------|-----------|-------|
+| Continue | `.continuerules` (root of repo) | Per-repository system prompt append |
+| Cline | `.clinerules` | Per-repository instruction file |
+| Roo Code | `.roo/rules/`, `.roo/rules-{mode}/` | Per-mode rules (Code, Architect, Debug, etc.) |
+
+These files are committed to the customer's source repositories and version-controlled alongside the code. This means the AI's context evolves with the codebase — as new patterns are adopted, the rules file is updated in a PR, reviewed, and applied automatically to all developers on the next workspace restart.
+
+**Example `.roo/rules/` structure for a polyglot microservices org:**
+
+```
+.roo/
+  rules/              ← applied to all modes
+    000-stack.md      ← Java 21, Spring Boot 3.3, PostgreSQL 16, Kafka 3.7
+    001-patterns.md   ← hexagonal architecture, port/adapter naming
+    002-banned.md     ← forbidden libraries and patterns
+  rules-code/         ← applied only in Code mode
+    java-style.md
+    sql-conventions.md
+  rules-architect/    ← applied only in Architect mode
+    adr-template.md
+    domain-model.md
+```
+
+#### 1.3 DevWorkspace Templates per Technology Stack
+
+The Dev Spaces `DevWorkspace` CR (Step 15) defines which container image, tools, runtimes, and environment variables the workspace pod runs. Customers with multiple tech stacks are given dedicated workspace templates:
+
+| Team / Stack | DevWorkspace image | Pre-installed tooling |
+|---|---|---|
+| Java / Spring | UBI 9 + JDK 21 + Maven 3.9 | `mvn`, `java`, `oc`, `git`, `stern` |
+| Python / FastAPI | UBI 9 + Python 3.12 | `uv`, `ruff`, `pytest`, `oc` |
+| Node.js / NestJS | UBI 9 + Node 22 | `npm`, `pnpm`, `eslint`, `jest`, `oc` |
+| Go | UBI 9 + Go 1.22 | `go`, `golangci-lint`, `oc` |
+| IaC / Platform Eng. | UBI 9 + toolbox | `terraform`, `ansible`, `oc`, `helm`, `kustomize` |
+
+The platform administrator maintains a catalog of `DevWorkspace` templates in a central ConfigMap. Developers select their workspace template from the Dev Spaces Dashboard — no local setup required.
+
+#### 1.4 MCP Server Integration with Internal Systems
+
+The Model Context Protocol (MCP) allows AI extensions to query live data sources as part of a conversation. For customers with internal knowledge systems, the following MCP server integrations are commonly delivered:
+
+- **Internal Confluence / Notion** — the AI can retrieve architecture decision records (ADRs), runbooks, and design documents when asked to generate code that must conform to documented patterns.
+- **Internal OpenAPI catalogs** — the AI has live access to the customer's internal service catalog, enabling accurate client code generation without hallucinating endpoint paths or schemas.
+- **Jira / issue tracker** — the AI can read the acceptance criteria and DoD from the linked issue, grounding its code generation in the actual requirements.
+- **Internal GitLab / GitHub** — code search across the customer's repos surfaces existing implementations of patterns, reducing duplication.
+
+MCP server connections are configured in the `roo-code-provider-config` ConfigMap (for Roo Code) or `.continue/config.yaml` (for Continue), and are distributed to all workspace pods centrally — developers get access to internal context without any local configuration.
+
+---
+
+### Track 2: SonarQube-Aware Code Generation
+
+SonarQube (or SonarCloud) is widely used to enforce code quality and security standards at the gate before code reaches test and production environments. A common friction point is that AI-generated code, while functionally correct, may carry code smells, security hotspots, or vulnerability patterns that fail the SonarQube quality gate — shifting remediation effort to the end of the development cycle when it is most expensive to fix.
+
+This track configures the AI assistant to **apply SonarQube rules at generation time**, so that the code produced is already aligned with the quality gate requirements before the developer commits it.
+
+#### 2.1 Embedding SonarQube Rule Profiles in System Prompts
+
+The primary mechanism is injecting the customer's active SonarQube quality profile as structured context in the system prompt. The platform administrator exports the quality profile rules from SonarQube (`Administration → Quality Profiles → Export`) and converts the relevant rules into plain-language instructions that are added to the global or per-project system prompt.
+
+**Example — Java security rules (derived from SonarQube Java Security Hotspot profile):**
+
+```
+## Code Quality Requirements (SonarQube Profile: ACME-Java-Strict)
+
+Security:
+- Never use java.util.Random for security-sensitive operations — use java.security.SecureRandom.
+- Do not log request parameters, headers, or authentication tokens at any log level (SQUID:S2068, S5145).
+- All SQL queries must use parameterized statements or JPA criteria. String concatenation into SQL is a blocker violation (SQUID:S2077).
+- Validate and sanitize all inputs received from HTTP requests before use (OWASP A03).
+- Do not suppress FindBugs / SpotBugs annotations without a documented justification comment.
+
+Reliability:
+- Resources opened in try blocks must be closed — use try-with-resources (SQUID:S2093).
+- Do not catch generic Exception or Throwable except at application boundaries (SQUID:S2221).
+- Null checks must be performed before dereferencing objects returned from external calls (SQUID:S2259).
+
+Maintainability:
+- Methods must not exceed 30 lines. Extract helper methods for logical sub-steps.
+- Cyclomatic complexity must stay below 10 per method (SQUID:S1541).
+- Do not duplicate code blocks of 5 or more lines — extract to a shared utility.
+- Magic numbers must be assigned to a named constant before use.
+```
+
+When this profile is in the system prompt, every code completion and agent task is evaluated by the model against these constraints before the output is presented to the developer.
+
+#### 2.2 SonarQube Findings as Live AI Context
+
+For codebases that already have accumulated SonarQube debt, the implementation delivers an MCP server that queries the customer's SonarQube instance in real time. When a developer asks the AI to fix a class or method, the MCP server fetches the open issues for that file from SonarQube and injects them as context:
+
+```
+[SonarQube context — src/main/java/com/acme/OrderService.java]
+Open issues:
+  LINE 47  BLOCKER  sql-injection        S2077  String concatenation in SQL query
+  LINE 89  CRITICAL security-hotspot     S5344  HTTP response splitting risk
+  LINE 112 MAJOR    code-smell           S1541  Method cyclomatic complexity is 14 (limit 10)
+  LINE 134 MINOR    code-smell           S1192  String literal duplicated 4 times
+```
+
+The model sees these issues as part of the conversation and addresses them alongside the developer's explicit request, without requiring the developer to context-switch to the SonarQube dashboard. This substantially reduces the number of SonarQube findings that survive to the CI gate.
+
+#### 2.3 Pre-Commit and CI Integration
+
+For teams using the Dev Spaces workspace as their primary development environment, the `postStart` lifecycle hook in the `DevWorkspace` CR can be extended to run a SonarQube scanner (`sonar-scanner` CLI) against changed files before a commit is made. Findings above a configured severity threshold are surfaced directly in the terminal, paired with an AI-generated suggested fix via a simple shell wrapper:
+
+```bash
+# sonar-precommit-hook.sh (injected via DevWorkspace postStart or git hook)
+sonar-scanner --define sonar.inclusions="$(git diff --name-only HEAD)" \
+              --define sonar.host.url="${SONAR_HOST_URL}" \
+              --define sonar.token="${SONAR_TOKEN}"
+
+# If blockers found, automatically open Roo Code with findings as context
+if [ "$SONAR_BLOCKER_COUNT" -gt 0 ]; then
+  echo "SonarQube found $SONAR_BLOCKER_COUNT blocker(s). Roo Code context loaded — ask 'Fix SonarQube blockers' to address them."
+fi
+```
+
+#### 2.4 Language-Specific SonarQube Customization Matrix
+
+The following matrix summarises the per-language customizations typically delivered as part of a SonarQube-aligned engagement:
+
+| Language | Common SonarQube Rules Addressed | AI Customization Applied |
+|---|---|---|
+| **Java** | SQL injection (S2077), log injection (S5145), resource leaks (S2093), complexity (S1541), null dereference (S2259) | System prompt: enforce parameterized queries, try-with-resources, method length limits |
+| **Python** | Hardcoded credentials (S2068), broad except clauses (S110), SQL injection (S3649), unused imports (S1128) | System prompt: enforce `secrets` module, specific exception types, SQLAlchemy ORM patterns |
+| **JavaScript / TypeScript** | Prototype pollution (S6268), XSS (S5728), `eval()` use (S1523), promise rejection (S4822), `==` vs `===` (S1440) | System prompt: enforce strict equality, ban `eval`, enforce `await/catch` patterns |
+| **Go** | Error return ignored (S1005), race conditions (S2696), hardcoded secrets (S2068), HTTP redirect (S5144) | System prompt: always handle error returns, use `sync` primitives, validate redirect URLs |
+| **Infrastructure (Terraform / YAML)** | Overly permissive IAM (S6302), unencrypted storage (S6245), public S3 buckets (S6249), missing TLS (S4423) | System prompt: enforce least-privilege IAM, encryption-at-rest, deny public bucket ACLs |
+
+#### 2.5 Continuous Improvement Loop
+
+The SonarQube customization is treated as a living configuration:
+
+1. **Baseline measurement** — before deployment, the SonarQube quality gate pass rate and mean issue density per PR are recorded.
+2. **Monthly review** — the platform administrator exports the top recurring issue types from SonarQube and updates the system prompt and MCP context rules to address the highest-frequency findings.
+3. **Quality gate trend reporting** — the reduction in new SonarQube issues per PR over time is tracked as the primary success metric for the implementation engagement.
+4. **Profile drift alerts** — when the SonarQube quality profile is updated by the security team, an automated job (delivered as an OpenShift CronJob) re-exports the profile and opens a PR against the platform's ConfigMap repository, ensuring the AI context stays in sync with the enforced rules.
 
 ---
 
