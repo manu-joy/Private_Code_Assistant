@@ -39,9 +39,9 @@ data:
     version: 1.0.0
     schema: v1
     models:
-      - name: Qwen3-Coder (llm-d)
+      - name: Qwen3.6-35B-A3B (llm-d)
         provider: openai
-        model: Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
+        model: unsloth/Qwen3.6-35B-A3B
         apiBase: https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1
         apiKey: EMPTY
         # Prevents the model from spontaneously generating XML tool-call syntax
@@ -51,9 +51,9 @@ data:
         requestOptions:
           verifySsl: false
     tabAutocompleteModel:
-      name: Qwen3-Coder Autocomplete (llm-d)
+      name: Qwen3.6-35B-A3B Autocomplete (llm-d)
       provider: openai
-      model: Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
+      model: unsloth/Qwen3.6-35B-A3B
       apiBase: https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1
       apiKey: EMPTY
       requestOptions:
@@ -86,23 +86,23 @@ data:
   cline_custom_modes.json: '[]'
   provider_profiles.json: |
     {
-      "currentApiConfigName": "llm-d-qwen3-coder",
+      "currentApiConfigName": "llm-d-qwen36-35b",
       "apiConfigs": {
-        "llm-d-qwen3-coder": {
-          "id": "llm-d-qwen3-coder",
+        "llm-d-qwen36-35b": {
+          "id": "llm-d-qwen36-35b",
           "apiProvider": "openai",
           "openAiBaseUrl": "https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1",
           "openAiApiKey": "EMPTY",
-          "openAiModelId": "Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8",
+          "openAiModelId": "unsloth/Qwen3.6-35B-A3B",
           "openAiStreamingEnabled": false
         }
       },
       "modeApiConfigs": {
-        "code": "llm-d-qwen3-coder",
-        "architect": "llm-d-qwen3-coder",
-        "ask": "llm-d-qwen3-coder",
-        "debug": "llm-d-qwen3-coder",
-        "orchestrator": "llm-d-qwen3-coder"
+        "code": "llm-d-qwen36-35b",
+        "architect": "llm-d-qwen36-35b",
+        "ask": "llm-d-qwen36-35b",
+        "debug": "llm-d-qwen36-35b",
+        "orchestrator": "llm-d-qwen36-35b"
       }
     }
 ---
@@ -123,23 +123,23 @@ data:
   cline_custom_modes.json: '[]'
   provider_profiles.json: |
     {
-      "currentApiConfigName": "llm-d-qwen3-coder",
+      "currentApiConfigName": "llm-d-qwen36-35b",
       "apiConfigs": {
-        "llm-d-qwen3-coder": {
-          "id": "llm-d-qwen3-coder",
+        "llm-d-qwen36-35b": {
+          "id": "llm-d-qwen36-35b",
           "apiProvider": "openai",
           "openAiBaseUrl": "https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1",
           "openAiApiKey": "EMPTY",
-          "openAiModelId": "Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8",
+          "openAiModelId": "unsloth/Qwen3.6-35B-A3B",
           "openAiStreamingEnabled": false
         }
       },
       "modeApiConfigs": {
-        "code": "llm-d-qwen3-coder",
-        "architect": "llm-d-qwen3-coder",
-        "ask": "llm-d-qwen3-coder",
-        "debug": "llm-d-qwen3-coder",
-        "orchestrator": "llm-d-qwen3-coder"
+        "code": "llm-d-qwen36-35b",
+        "architect": "llm-d-qwen36-35b",
+        "ask": "llm-d-qwen36-35b",
+        "debug": "llm-d-qwen36-35b",
+        "orchestrator": "llm-d-qwen36-35b"
       }
     }
 ---
@@ -160,22 +160,22 @@ data:
   cline_custom_modes.json: '[]'
   provider_profiles.json: |
     {
-      "currentApiConfigName": "llm-d-qwen3-coder",
+      "currentApiConfigName": "llm-d-qwen36-35b",
       "apiConfigs": {
-        "llm-d-qwen3-coder": {
-          "id": "llm-d-qwen3-coder",
+        "llm-d-qwen36-35b": {
+          "id": "llm-d-qwen36-35b",
           "apiProvider": "openai",
           "openAiBaseUrl": "https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1",
           "openAiApiKey": "EMPTY",
-          "openAiModelId": "Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8",
+          "openAiModelId": "unsloth/Qwen3.6-35B-A3B",
           "openAiStreamingEnabled": false
         }
       },
       "modeApiConfigs": {
-        "code": "llm-d-qwen3-coder",
-        "architect": "llm-d-qwen3-coder",
-        "ask": "llm-d-qwen3-coder",
-        "debug": "llm-d-qwen3-coder",
-        "orchestrator": "llm-d-qwen3-coder"
+        "code": "llm-d-qwen36-35b",
+        "architect": "llm-d-qwen36-35b",
+        "ask": "llm-d-qwen36-35b",
+        "debug": "llm-d-qwen36-35b",
+        "orchestrator": "llm-d-qwen36-35b"
       }
     }

@@ -1,23 +1,24 @@
-# LLMInferenceService — Qwen3-Coder-30B on NVIDIA A100 80 GB via KServe + llm-d
+# LLMInferenceService — Qwen3.6-35B-A3B on NVIDIA A100 80 GB via KServe + llm-d
 # ARO deployment: Standard_NC24ads_A100_v4 GPU nodes (80 GB HBM2)
-# A100 has 80 GB vs L40S 48 GB — allows larger max-model-len for longer context windows.
+# Qwen3.6-35B-A3B is a MoE model (~3B active params) — low memory footprint, high quality.
+# Model loaded in BF16; FP8 KV cache reduces memory pressure for long context windows.
 # This single CR creates: Deployment, Service, InferencePool, EPP, HTTPRoute
 ---
 apiVersion: serving.kserve.io/v1alpha1
 kind: LLMInferenceService
 metadata:
-  name: qwen3-coder
+  name: qwen36-35b
   namespace: ai-serving
   annotations:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     opendatahub.io/model-type: generative
-    openshift.io/display-name: Qwen3 Coder 30B
+    openshift.io/display-name: Qwen3.6 35B A3B
     security.opendatahub.io/enable-auth: "false"
 spec:
   modelSpec:
-    uri: hf://Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
-    name: Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8
+    uri: hf://unsloth/Qwen3.6-35B-A3B
+    name: unsloth/Qwen3.6-35B-A3B
     replicas: 1
   routerSpec:
     targetModels: {}
@@ -98,8 +99,8 @@ spec:
                   --gpu-memory-utilization 0.90
                   --enable-prefix-caching
                   --enable-auto-tool-choice
-                  --tool-call-parser qwen3_coder
-                  --reasoning-parser qwen3
+                  --tool-call-parser hermes
+                  
                   --kv-cache-dtype fp8
             volumeMounts:
               - name: kserve-provision-location

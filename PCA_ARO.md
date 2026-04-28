@@ -12,7 +12,7 @@ ROSA-based deployment, updated for Azure infrastructure, the NVIDIA A100 GPU, an
 **Red Hat OpenShift AI 3.3** with the **llm-d AI Gateway now GA**.
 
 The PCA provides enterprise development teams with a self-hosted, air-gappable AI coding
-assistant powered by **Qwen3-Coder-30B** — with no data leaving the customer's Azure environment.
+assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's Azure environment.
 
 ---
 
@@ -38,7 +38,7 @@ assistant powered by **Qwen3-Coder-30B** — with no data leaving the customer's
 │  ┌────────────────────────▼────────────────────────────────────────┐   │
 │  │                 AI Inference Tier                                │   │
 │  │  vLLM + KServe (RHOAI 3.3)                                      │   │
-│  │  Qwen3-Coder-30B-A3B-Instruct-FP8                               │   │
+│  │  Qwen3.6-35B-A3B-A3B-Instruct-FP8                               │   │
 │  │  NVIDIA A100 80 GB  ·  BF16 compute  ·  FP8 KV cache            │   │
 │  │  Standard_NC24ads_A100_v4  ($3.67/hr)                           │   │
 │  └─────────────────────────────────────────────────────────────────┘   │
@@ -68,11 +68,11 @@ The closest available GPU for single-node LLM inference on Azure is the A100:
 | NVIDIA H100 NVL (Azure) | 94 GB | Yes | `NC40ads_H100_v5` | $6.98 |
 
 The A100 is the right choice because:
-- **Single-GPU fit:** 80 GB fits Qwen3-Coder-30B at FP8 (~30 GB weights) with a 65,536-token
+- **Single-GPU fit:** 80 GB fits Qwen3.6-35B-A3B at FP8 (~30 GB weights) with a 65,536-token
   context window and KV cache — comfortably larger than the 32,768-token window on L40S
 - **FP8 support:** Native FP8 on Ampere for inference acceleration
 - **No tensor parallelism needed:** Single-GPU inference avoids multi-GPU coordination overhead
-- **A10 ruled out:** Maximum 24 GB per Azure A10 VM — too small for Qwen3-Coder-30B
+- **A10 ruled out:** Maximum 24 GB per Azure A10 VM — too small for Qwen3.6-35B-A3B
 - **H100 ruled out:** ~2× the cost for incremental throughput gains on a 30B model
 
 ---
@@ -144,7 +144,7 @@ For full deployment instructions, see [PCA_Deployment_ARO/README.md](PCA_Deploym
 
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
-| Model | `Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8` | State-of-the-art code reasoning, FP8 quantized |
+| Model | `unsloth/Qwen3.6-35B-A3B` | State-of-the-art code reasoning, FP8 quantized |
 | GPU | NVIDIA A100 80 GB | Single-GPU fit with headroom |
 | dtype | `bf16` | A100 native compute dtype (better than fp16 for training stability) |
 | max-model-len | 65,536 | Full 65K context window enabled by A100's 80 GB HBM2 |
@@ -183,7 +183,7 @@ PCA_Deployment_ARO/
 ### guidellm Sweep Results (To Be Updated)
 
 **Test Configuration:**
-- Model: `Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8`
+- Model: `unsloth/Qwen3.6-35B-A3B`
 - GPU: `Standard_NC24ads_A100_v4` (NVIDIA A100 80 GB)
 - Concurrency: 1, 2, 4, 8, 16 simultaneous requests
 - Prompt lengths: 256, 512, 1024, 2048 tokens
@@ -193,7 +193,7 @@ PCA_Deployment_ARO/
 # Command used to generate benchmarks (to be run after cluster deployment):
 guidellm benchmark \
   --target https://llm-d-gateway-data-science-gateway-class.ai-serving.svc.cluster.local/v1 \
-  --model Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 \
+  --model unsloth/Qwen3.6-35B-A3B \
   --max-requests 200 \
   --rate-type sweep \
   --output-path ./benchmark-results/aro-a100-sweep.json
