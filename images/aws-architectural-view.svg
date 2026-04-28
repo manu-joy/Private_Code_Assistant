@@ -32,7 +32,7 @@
   <rect x="0" y="0" width="1920" height="4" fill="#ee0000"/>
 
   <!-- Header -->
-  <text x="960" y="46" text-anchor="middle" fill="#fff" font-size="28" font-weight="700">Private AI Code Assistant  AWS Architectural View</text>
+  <text x="960" y="46" text-anchor="middle" fill="#fff" font-size="28" font-weight="700">Private AI Code Assistant  &#x2014;  AWS Architectural View</text>
   <text x="960" y="70" text-anchor="middle" fill="#8fabc7" font-size="15">Enterprise Private Connectivity &#xB7; No Internet Gateway &#xB7; Source Code Never Leaves the Perimeter</text>
   <line x1="60" y1="84" x2="1860" y2="84" stroke="#2a4a6b" stroke-width="1"/>
 
@@ -76,13 +76,13 @@
     <g transform="translate(20, 334)">
       <rect width="220" height="240" rx="8" fill="#081218" stroke="#2a4a6b" stroke-width="1"/>
       <text x="110" y="20" text-anchor="middle" fill="#4a6a8a" font-size="12" font-weight="700">Security Properties</text>
-      <text x="16" y="42" fill="#3a6a5a" font-size="10"> No public internet path</text>
-      <text x="16" y="58" fill="#3a6a5a" font-size="10"> Dedicated private circuit</text>
-      <text x="16" y="74" fill="#3a6a5a" font-size="10"> Corporate IDP via OIDC</text>
-      <text x="16" y="90" fill="#3a6a5a" font-size="10"> Source code stays in VPC</text>
-      <text x="16" y="106" fill="#3a6a5a" font-size="10"> GDPR / data sovereignty</text>
-      <text x="16" y="122" fill="#3a6a5a" font-size="10"> No vendor relay</text>
-      <text x="16" y="138" fill="#3a6a5a" font-size="10"> Audit trail in cluster logs</text>
+      <text x="16" y="42" fill="#3a6a5a" font-size="10">&#x2022;  No public internet path</text>
+      <text x="16" y="58" fill="#3a6a5a" font-size="10">&#x2022;  Dedicated private circuit</text>
+      <text x="16" y="74" fill="#3a6a5a" font-size="10">&#x2022;  Corporate IDP via OIDC</text>
+      <text x="16" y="90" fill="#3a6a5a" font-size="10">&#x2022;  Source code stays in VPC</text>
+      <text x="16" y="106" fill="#3a6a5a" font-size="10">&#x2022;  GDPR / data sovereignty</text>
+      <text x="16" y="122" fill="#3a6a5a" font-size="10">&#x2022;  No vendor relay</text>
+      <text x="16" y="138" fill="#3a6a5a" font-size="10">&#x2022;  Audit trail in cluster logs</text>
       <text x="16" y="158" fill="#3a5a7a" font-size="10">Alt: AWS VPN (IPSec)</text>
       <text x="16" y="174" fill="#3a5a7a" font-size="10">Alt: Public HTTPS (Internet)</text>
       <text x="16" y="190" fill="#3a5a7a" font-size="10">    (if Route exposed publicly)</text>
@@ -99,7 +99,7 @@
     <!-- AWS outer box -->
     <rect width="1490" height="900" rx="14" fill="none" stroke="#ff9900" stroke-width="2" stroke-dasharray="10,5"/>
     <rect width="200" height="26" rx="4" fill="#ff9900" transform="translate(645, -13)"/>
-    <text x="745" y="6" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Amazon Web Services  us-east-2 (Ohio)</text>
+    <text x="745" y="6" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Amazon Web Services  &#x2014;  us-east-2 (Ohio)</text>
 
     <!-- Transit Gateway -->
     <g transform="translate(20, 260)">
@@ -117,7 +117,7 @@
     <g transform="translate(300, 20)">
       <rect width="1160" height="860" rx="12" fill="url(#vpcGrad)" stroke="#00b4d8" stroke-width="2" filter="url(#sh)"/>
       <rect width="260" height="26" rx="4" fill="#00b4d8" transform="translate(450, -13)"/>
-      <text x="580" y="6" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">ROSA VPC (10.0.0.0/16)  Private Subnets Only</text>
+      <text x="580" y="6" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">ROSA VPC (10.0.0.0/16)  &#x2014;  Private Subnets Only</text>
 
       <!-- No IGW badge -->
       <g transform="translate(20, 16)">
@@ -138,10 +138,10 @@
       <line x1="580" y1="76" x2="580" y2="108" stroke="#ff9900" stroke-width="1.5" marker-end="url(#arrowO)"/>
       <line x1="1000" y1="76" x2="1000" y2="108" stroke="#ff9900" stroke-width="1.5" marker-end="url(#arrowO)"/>
 
-      <!--    AZ a    -->
+      <!--  AZ a  -->
       <g transform="translate(20, 110)">
         <rect width="340" height="500" rx="10" fill="url(#azGrad)" stroke="#4a90d9" stroke-width="1.5"/>
-        <text x="170" y="22" text-anchor="middle" fill="#4a90d9" font-size="12" font-weight="700">Availability Zone  us-east-2a</text>
+        <text x="170" y="22" text-anchor="middle" fill="#4a90d9" font-size="12" font-weight="700">Availability Zone  &#x2014;  us-east-2a</text>
         <text x="170" y="38" text-anchor="middle" fill="#3a6a9e" font-size="10">Private Subnet: 10.0.1.0/24</text>
 
         <!-- Worker: g6e -->
@@ -188,10 +188,10 @@
         </g>
       </g>
 
-      <!--    AZ b    -->
+      <!--  AZ b  -->
       <g transform="translate(400, 110)">
         <rect width="340" height="500" rx="10" fill="url(#azGrad)" stroke="#4a90d9" stroke-width="1.5"/>
-        <text x="170" y="22" text-anchor="middle" fill="#4a90d9" font-size="12" font-weight="700">Availability Zone  us-east-2b</text>
+        <text x="170" y="22" text-anchor="middle" fill="#4a90d9" font-size="12" font-weight="700">Availability Zone  &#x2014;  us-east-2b</text>
         <text x="170" y="38" text-anchor="middle" fill="#3a6a9e" font-size="10">Private Subnet: 10.0.2.0/24</text>
 
         <!-- Worker: inf2 -->
@@ -237,10 +237,10 @@
         </g>
       </g>
 
-      <!--    AZ c    -->
+      <!--  AZ c  -->
       <g transform="translate(780, 110)">
         <rect width="340" height="500" rx="10" fill="url(#azGrad)" stroke="#4a90d9" stroke-width="1.5"/>
-        <text x="170" y="22" text-anchor="middle" fill="#4a90d9" font-size="12" font-weight="700">Availability Zone  us-east-2c</text>
+        <text x="170" y="22" text-anchor="middle" fill="#4a90d9" font-size="12" font-weight="700">Availability Zone  &#x2014;  us-east-2c</text>
         <text x="170" y="38" text-anchor="middle" fill="#3a6a9e" font-size="10">Private Subnet: 10.0.3.0/24</text>
 
         <!-- Additional workers -->
@@ -248,7 +248,7 @@
           <rect width="310" height="80" rx="8" fill="#1a1000" stroke="#cc7700" stroke-width="1" stroke-dasharray="4,3"/>
           <text x="155" y="20" text-anchor="middle" fill="#cc9933" font-size="11" font-weight="600">Additional GPU Workers</text>
           <text x="155" y="36" text-anchor="middle" fill="#8a6a3a" font-size="10">(Scale Phase 2+)</text>
-          <text x="155" y="52" text-anchor="middle" fill="#8a6a3a" font-size="10">g6e.2xlarge  llm-d pool member</text>
+          <text x="155" y="52" text-anchor="middle" fill="#8a6a3a" font-size="10">g6e.2xlarge  &#x2014;  llm-d pool member</text>
           <text x="155" y="68" text-anchor="middle" fill="#6a4a2a" font-size="10">Auto-scaled via MachineSet</text>
         </g>
 
@@ -256,7 +256,7 @@
         <g transform="translate(15, 148)">
           <rect width="310" height="80" rx="8" fill="#1a0800" stroke="#ff6600" stroke-width="1.5"/>
           <text x="155" y="22" text-anchor="middle" fill="#ff8844" font-size="11" font-weight="700">AWS PrivateLink</text>
-          <text x="155" y="38" text-anchor="middle" fill="#cc6633" font-size="10">K8s API :6443  private endpoint</text>
+          <text x="155" y="38" text-anchor="middle" fill="#cc6633" font-size="10">K8s API :6443  &#x2014;  private endpoint</text>
           <text x="155" y="54" text-anchor="middle" fill="#cc6633" font-size="10">oc login &#xB7; CI/CD &#xB7; GitOps</text>
           <text x="155" y="70" text-anchor="middle" fill="#9e4a2a" font-size="10">No public API exposure</text>
         </g>
