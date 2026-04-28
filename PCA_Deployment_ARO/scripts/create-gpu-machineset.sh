@@ -70,9 +70,11 @@ GPU_MS_JSON=$(echo "${TEMPLATE_JSON}" | jq --arg name "${GPU_MS_NAME}" \
   | .spec.template.metadata.labels["machine.openshift.io/cluster-api-machineset"] = $name
   # Set replicas
   | .spec.replicas = $replicas
-  # Set VM size — keep the existing image from the cloned MachineSet
-  # ARO 4.19 images already support Gen2 VMs required by NC A100 v4 series
+  # Set VM size
   | .spec.template.spec.providerSpec.value.vmSize = $vm_size
+  # A100 requires Hyper-V Gen2 — override image SKU to the Gen2 variant
+  # (default workers use aro_419 which is Gen1; 419-v2 is the Gen2 equivalent)
+  | .spec.template.spec.providerSpec.value.image.sku = "419-v2"
   # GPU-specific labels
   | .spec.template.spec.metadata.labels["nvidia.com/gpu.present"] = "true"
   | .spec.template.spec.metadata.labels["node-role.kubernetes.io/gpu"] = ""

@@ -13,13 +13,14 @@ metadata:
 spec:
   operator:
     defaultRuntime: crio
+  daemonsets: {}
   driver:
     enabled: true
     useOpenShiftDriverToolkit: true
     upgradePolicy:
       autoUpgrade: true
       maxParallelUpgrades: 1
-      maxUnavailable: 25%
+      maxUnavailable: "25%"
   toolkit:
     enabled: true
   devicePlugin:
