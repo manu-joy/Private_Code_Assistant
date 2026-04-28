@@ -247,25 +247,25 @@ The diagram illustrates the four-step request lifecycle:
 
 > **Tip:** Open each `.svg` file directly in your browser or IDE for full-resolution rendering.
 
-![Full-Stack Architecture Diagram](images/architecture-diagram-landscape.svg)
+![Full-Stack Architecture Diagram](images/architecture-diagram-landscape.png)
 
 ### Deployment View (Layered Architecture)
 
 Four-layer left-to-right flow: **Application/Workload** (Dev Spaces → Service Mesh Gateway → llm-d EPP → vLLM Pods) → **Operator/Driver** (11 operators including RHOAI/KServe, GPU Operator, Neuron Operator, Service Mesh, NFD, cert-manager, KMM, LeaderWorkerSet) → **Platform** (ROSA HCP 4.21) → **Infrastructure** (AWS EC2 + EBS + NVMe). Note: llm-d is not an operator -- it is CRDs and controllers deployed by RHOAI/KServe.
 
-![Deployment View — Layered Architecture](images/deployment-view-layered.svg)
+![Deployment View — Layered Architecture](images/deployment-view-layered.png)
 
 ### AWS Architectural View
 
 Enterprise private connectivity design: developers on **customer premises** connect via **AWS Direct Connect** (dedicated circuit) through a **Transit Gateway** to the **ROSA VPC**. An internal **NLB** distributes traffic to worker nodes across three Availability Zones. The Kubernetes API is accessible via **AWS PrivateLink**. No Internet Gateway -- source code never traverses the public internet.
 
-![AWS Architectural View](images/aws-architectural-view.svg)
+![AWS Architectural View](images/aws-architectural-view.png)
 
 ### Red Hat Components View
 
 OpenShift-centric view: **external** components (developers, AWS NLB, EC2 nodes, EBS/NVMe storage) sit outside the cluster boundary. **All software components** -- Dev Spaces, Service Mesh Gateway, llm-d EPP, vLLM pods, 11 operators, platform services -- reside inside the OpenShift cluster. Organized by namespace: `openshift-devspaces`, `openshift-ingress`, `llm-d-multi-gpu`, plus operator namespaces.
 
-![Red Hat Components View](images/redhat-components-view.svg)
+![Red Hat Components View](images/redhat-components-view.png)
 
 ## Frontend: Developer IDE Environment
 
