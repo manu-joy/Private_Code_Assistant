@@ -1,5 +1,6 @@
-# LLMInferenceService — Qwen3.6-35B-A3B on NVIDIA A100 80 GB via RHOAI 3.3
+# LLMInferenceService — Qwen3.6-35B-A3B-FP8 on NVIDIA A100 80 GB via RHOAI 3.3
 # ARO deployment: Standard_NC24ads_A100_v4 GPU nodes (80 GB HBM2)
+# Official Qwen FP8 quantized model (~37 GB vs ~70 GB BF16) — native vLLM FP8 support.
 # Qwen3.6-35B-A3B is a MoE model (~3B active params) — low memory footprint, high quality.
 # RHOAI 3.3 LLMInferenceService automatically creates:
 #   Deployment, Service, InferencePool, EPP router, LeaderWorkerSet
@@ -13,10 +14,10 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
     opendatahub.io/model-type: generative
-    openshift.io/display-name: "Qwen3.6 35B A3B"
+    openshift.io/display-name: "Qwen3.6 35B A3B FP8"
     security.opendatahub.io/enable-auth: "false"
 spec:
   model:
-    uri: "hf://unsloth/Qwen3.6-35B-A3B"
-    name: "unsloth/Qwen3.6-35B-A3B"
+    uri: "hf://Qwen/Qwen3.6-35B-A3B-FP8"
+    name: "Qwen/Qwen3.6-35B-A3B-FP8"
   replicas: 1
