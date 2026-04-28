@@ -10,7 +10,7 @@ output "cluster_api_url" {
 
 output "cluster_console_url" {
   description = "OpenShift web console URL"
-  value       = azurerm_redhat_openshift_cluster.aro.console_profile[0].url
+  value       = azurerm_redhat_openshift_cluster.aro.console_url
 }
 
 output "resource_group_name" {
@@ -30,5 +30,5 @@ output "service_principal_client_id" {
 
 output "get_credentials_command" {
   description = "Command to retrieve ARO kubeadmin credentials via Azure CLI"
-  value       = "az aro list-credentials --name ${azurerm_redhat_openshift_cluster.aro.name} --resource-group ${azurerm_resource_group.aro.resource_group_name}"
+  value       = "az aro list-credentials --name ${azurerm_redhat_openshift_cluster.aro.name} --resource-group ${azurerm_resource_group.aro.name}"
 }

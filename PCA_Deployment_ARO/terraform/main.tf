@@ -108,7 +108,7 @@ resource "azuread_service_principal" "aro" {
 
 resource "azuread_service_principal_password" "aro" {
   service_principal_id = azuread_service_principal.aro.id
-  end_date_relative    = "8760h" # 1 year
+  end_date             = timeadd(timestamp(), "8760h") # 1 year
 }
 
 # Network Contributor on the VNet (ARO needs to manage network resources)
