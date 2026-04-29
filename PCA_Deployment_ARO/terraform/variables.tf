@@ -29,13 +29,13 @@ variable "cluster_name" {
 variable "location" {
   description = "Azure region for all resources"
   type        = string
-  default     = "eastus"
+  default     = "centralus"
 }
 
 variable "aro_version" {
   description = "OpenShift version for ARO cluster (e.g. 4.19.19)"
   type        = string
-  default     = "4.19.20"
+  default     = "4.19.24"
 }
 
 variable "pull_secret" {

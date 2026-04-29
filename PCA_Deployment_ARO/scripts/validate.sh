@@ -97,11 +97,11 @@ fi
 # 7. Model Serving
 echo ""
 echo "--- Checking Model Serving ---"
-LIS_STATUS=$(oc get llminferenceservice qwen3-coder -n ai-serving -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "NOT_FOUND")
+LIS_STATUS=$(oc get llminferenceservice qwen36-35b -n ai-serving -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "NOT_FOUND")
 if [ "$LIS_STATUS" = "True" ]; then
-  pass "LLMInferenceService qwen3-coder is Ready"
+  pass "LLMInferenceService qwen36-35b is Ready"
 else
-  warn "LLMInferenceService qwen3-coder Ready = ${LIS_STATUS} (may be starting up)"
+  warn "LLMInferenceService qwen36-35b Ready = ${LIS_STATUS} (may be starting up)"
 fi
 
 # 8. Gateway

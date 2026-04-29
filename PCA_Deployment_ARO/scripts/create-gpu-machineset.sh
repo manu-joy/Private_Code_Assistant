@@ -13,7 +13,7 @@ set -euo pipefail
 
 GPU_VM_SIZE="${1:-Standard_NC24ads_A100_v4}"
 RESOURCE_GROUP="${2:-}"
-LOCATION="${3:-eastus}"
+LOCATION="${3:-centralus}"
 REPLICAS="${4:-1}"
 
 RED='\033[0;31m'
@@ -73,8 +73,13 @@ GPU_MS_JSON=$(echo "${TEMPLATE_JSON}" | jq --arg name "${GPU_MS_NAME}" \
   # Set VM size
   | .spec.template.spec.providerSpec.value.vmSize = $vm_size
   # A100 requires Hyper-V Gen2 — override image SKU to the Gen2 variant
-  # (default workers use aro_419 which is Gen1; 419-v2 is the Gen2 equivalent)
-  | .spec.template.spec.providerSpec.value.image.sku = "419-v2"
+  # (default workers use aro_4XX which is Gen1; 4XX-v2 is the Gen2 equivalent)
+  # Derive the Gen2 SKU from the existing Gen1 SKU (e.g. aro_419 → 419-v2)
+  | .spec.template.spec.providerSpec.value.image.sku = (
+      .spec.template.spec.providerSpec.value.image.sku
+      | sub("^aro_"; "")
+      | . + "-v2"
+    )
   # GPU-specific labels
   | .spec.template.spec.metadata.labels["nvidia.com/gpu.present"] = "true"
   | .spec.template.spec.metadata.labels["node-role.kubernetes.io/gpu"] = ""

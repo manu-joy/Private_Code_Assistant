@@ -50,7 +50,7 @@ az provider register --namespace Microsoft.Authorization --wait
 |-----------|--------------|
 | Platform | Azure Red Hat OpenShift (ARO) |
 | OpenShift version | 4.19.19 |
-| Azure region | East US (`eastus`) |
+| Azure region | Central US (`centralus`) |
 | Master nodes | 3× `Standard_D8s_v5` |
 | Worker nodes | 3× `Standard_D8s_v5` (auto-scaled 3–6) |
 | GPU nodes | 1× `Standard_NC24ads_A100_v4` (NVIDIA A100 80 GB) |
@@ -153,7 +153,7 @@ To manually trigger GPU node provisioning after cluster creation:
 
 ```bash
 oc login <API_URL> --username=kubeadmin --password=<PASSWORD>
-./scripts/create-gpu-machineset.sh Standard_NC24ads_A100_v4 aro-pca-rg eastus 1
+./scripts/create-gpu-machineset.sh Standard_NC24ads_A100_v4 aro-pca-rg centralus 1
 ```
 
 Monitor the MachineSet:
@@ -184,7 +184,7 @@ oc get nodes -l nvidia.com/gpu.present=true
 ## Troubleshooting
 
 **ARO cluster creation fails with "InsufficientQuota":**
-Request an A100 quota increase in East US via Azure Portal → Quotas → Compute.
+Request an A100 quota increase in Central US via Azure Portal → Quotas → Compute.
 The `Standard_NC24ads_A100_v4` requires `Standard NCADSv4Family` quota.
 
 **GPU node stuck in Provisioning:**
@@ -199,7 +199,7 @@ for ARO as it uses the Red Hat Driver Toolkit for in-cluster driver compilation.
 
 **Model pod not scheduling on GPU node:**
 ```bash
-oc describe pod -n ai-serving -l serving.kserve.io/inferenceservice=qwen3-coder
+oc describe pod -n ai-serving -l serving.kserve.io/inferenceservice=qwen36-35b
 ```
 Check nodeSelector matches `node.kubernetes.io/instance-type: Standard_NC24ads_A100_v4`
 and that the GPU taint toleration is present.

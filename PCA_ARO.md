@@ -21,7 +21,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                     Azure Red Hat OpenShift (ARO)                       │
-│                          East US — OCP 4.19.19                          │
+│                        Central US — OCP 4.19                            │
 │                                                                         │
 │  ┌─────────────────────────────────────────────────────────────────┐   │
 │  │                      Developer Tier                              │   │
@@ -48,7 +48,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 │  │  RHOAI 3.3 (fast-3.x)     │  │  Resource Group · VNet           │  │
 │  │  OpenShift GitOps          │  │  Azure AD Service Principal      │  │
 │  │  NVIDIA GPU Operator       │  │  managed-csi storage         │  │
-│  │  Service Mesh · Serverless │  │  East US region                  │  │
+│  │  Service Mesh · Serverless │  │  Central US region               │  │
 │  └────────────────────────────┘  └──────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -60,7 +60,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 Azure does not offer NVIDIA L40S virtual machines (the GPU used on AWS `g6e.2xlarge`).
 The closest available GPU for single-node LLM inference on Azure is the A100:
 
-| GPU | VRAM | FP8 | Azure VM | $/hr (East US) |
+| GPU | VRAM | FP8 | Azure VM | $/hr (Central US) |
 |-----|------|-----|----------|---------------|
 | NVIDIA L40S (AWS) | 48 GB GDDR6 | Yes | `g6e.2xlarge` | $2.07 |
 | **NVIDIA A100 (Azure)** | **80 GB HBM2** | **Yes** | `Standard_NC24ads_A100_v4` | **$3.67** |
@@ -81,7 +81,7 @@ The A100 is the right choice because:
 
 | Resource | Type | Count |
 |----------|------|-------|
-| ARO Cluster | OCP 4.19.19 | 1 |
+| ARO Cluster | OCP 4.19 | 1 |
 | Master nodes | `Standard_D8s_v5` | 3 |
 | Worker nodes | `Standard_D8s_v5` | 3 (auto-scaled 3–6) |
 | GPU nodes | `Standard_NC24ads_A100_v4` | 1 |
@@ -89,7 +89,7 @@ The A100 is the right choice because:
 | Subnets | Master + Worker | 2 |
 | Storage | managed-csi PVC | 100 Gi |
 
-**Estimated monthly cost (East US, pay-as-you-go):**
+**Estimated monthly cost (Central US, pay-as-you-go):**
 - ARO cluster fee: ~$0.18/hr (Microsoft managed control plane)
 - 3× `Standard_D8s_v5` workers: ~$1.15/hr
 - 1× `Standard_NC24ads_A100_v4` GPU node: $3.67/hr
