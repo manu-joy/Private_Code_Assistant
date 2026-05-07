@@ -54,7 +54,7 @@ az provider register --namespace Microsoft.Authorization --wait
 | Master nodes | 3× `Standard_D8s_v5` |
 | Worker nodes | 3× `Standard_D8s_v5` (auto-scaled 3–6) |
 | GPU nodes | 1× `Standard_NC24ads_A100_v4` (NVIDIA A100 80 GB) |
-| RHOAI version | 3.4 EA2 (`alpha` channel) |
+| RHOAI version | 3.3.2 (`stable-3.x` channel) |
 | AI Gateway | llm-d v0.4 (GA) |
 | Model | Qwen3.6-35B-A3B-FP8 |
 
@@ -175,7 +175,7 @@ oc get nodes -l nvidia.com/gpu.present=true
 | Storage class | `gp3-csi` | `managed-csi` |
 | IDP | HTPasswd via RHCS Terraform resource | kubeadmin + manual HTPasswd |
 | Inferentia nodes | Optional `inf2.24xlarge` pool | Not applicable (removed) |
-| RHOAI channel | `stable-2.19` | `alpha` (RHOAI 3.4 EA2) |
+| RHOAI channel | `stable-2.19` | `stable-3.x` (RHOAI 3.3.2) |
 | llm-d / AI Gateway | Technology Preview | **GA at v0.4** |
 | vLLM max-model-len | 32768 (L40S 48 GB) | **65536** (A100 80 GB) |
 

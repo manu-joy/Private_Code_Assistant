@@ -37,7 +37,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 │                           │                                             │
 │  ┌────────────────────────▼────────────────────────────────────────┐   │
 │  │                 AI Inference Tier                                │   │
-│  │  vLLM + KServe (RHOAI 3.4 EA2)                                  │   │
+│  │  vLLM + KServe (RHOAI 3.3.2)                                    │   │
 │  │  Qwen3.6-35B-A3B-FP8                               │   │
 │  │  NVIDIA A100 80 GB  ·  BF16 compute  ·  FP8 KV cache            │   │
 │  │  Standard_NC24ads_A100_v4  ($3.67/hr)                           │   │
@@ -45,7 +45,7 @@ assistant powered by **Qwen3.6-35B-A3B** — with no data leaving the customer's
 │                                                                         │
 │  ┌────────────────────────────┐  ┌──────────────────────────────────┐  │
 │  │     Platform Operators     │  │       Azure Infrastructure       │  │
-│  │  RHOAI 3.4 EA2 (alpha)     │  │  Resource Group · VNet           │  │
+│  │  RHOAI 3.3.2 (stable-3.x)  │  │  Resource Group · VNet           │  │
 │  │  OpenShift GitOps          │  │  Azure AD Service Principal      │  │
 │  │  NVIDIA GPU Operator       │  │  managed-csi storage         │  │
 │  │  Service Mesh · Serverless │  │  Central US region               │  │
@@ -162,7 +162,7 @@ PCA_Deployment_ARO/
 ├── terraform/          # Azure infrastructure (ARO cluster, VNet, AD SP)
 ├── argocd/
 │   ├── 00-app-of-apps.yaml       # Root ArgoCD application
-│   ├── 01-operators/             # RHOAI 3.4 EA2, NVIDIA GPU Operator, DevSpaces
+│   ├── 01-operators/             # RHOAI 3.3.2, NVIDIA GPU Operator, DevSpaces
 │   ├── 02-platform-config/       # DataScienceCluster, CheCluster, namespaces, RBAC
 │   ├── 03-ai-serving/            # LLMInferenceService, llm-d Gateway, PVCs
 │   └── 04-devspaces/             # DevWorkspaces, VS Code extension config
