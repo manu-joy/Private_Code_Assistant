@@ -1,8 +1,9 @@
 # All operator Subscriptions managed by ArgoCD.
 # Sync wave 1: these must install before platform config (wave 2) uses their CRDs.
 ---
-# Red Hat OpenShift AI (RHOAI) 3.3.2 — AI Gateway (llm-d) GA
-# stable-3.x is the recommended channel for new installs (fast-3.x deprecated after 3.3)
+# Red Hat OpenShift AI (RHOAI) 3.4 EA2 — AI Gateway (llm-d) GA + enhanced config
+# alpha channel delivers 3.4 EA2 (PoC use only — not production-supported)
+# For production, switch to stable-3.x (delivers 3.3.2 GA)
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -27,7 +28,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  channel: stable-3.x
+  channel: alpha
   installPlanApproval: Automatic
   name: rhods-operator
   source: redhat-operators
